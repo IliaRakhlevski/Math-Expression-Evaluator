@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cctype>
 #include "Tokenizer.h"
 using namespace std;

@@ -97,7 +97,9 @@ void ShuntingYard::process_operator(Token& token)
 		{
 			rpn.push_back(top_token);
 			op_stack.pop();
-		}	
+		}
+		else
+			break;
 	}
 
 	op_stack.push(token);
