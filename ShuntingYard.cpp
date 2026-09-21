@@ -72,6 +72,8 @@ bool ShuntingYard::is_operator(const Token& token)
 	case TokenType::UNARY_MINUS:
 		res = true;
 		break;
+	default:
+		break;
 	}
 	return res;
 }
@@ -88,10 +90,7 @@ void ShuntingYard::process_operator(Token& token)
 			break;
 
 		ComparePrecedenceRes prec_res = compare_precedences(top_token, token);
-		if (prec_res == ComparePrecedenceRes::UNKNOWN) { /* TBD */ }
-
 		Associative ass_res = get_associative(token);
-		if(ass_res == Associative::UNKNOWN) { /* TBD */ }
 
 		if ( prec_res == ComparePrecedenceRes::GREATER || (prec_res == ComparePrecedenceRes::EQUAL && ass_res == Associative::LEFT) )
 		{
@@ -106,7 +105,7 @@ void ShuntingYard::process_operator(Token& token)
 }
 
 
-void ShuntingYard::process_right_paren(Token& token)
+void ShuntingYard::process_right_paren()
 {
 	while (!op_stack.empty())
 	{
@@ -152,7 +151,7 @@ void ShuntingYard::create_rpn()
 			op_stack.push(token);
 			break;
 		case TokenType::RPAREN:
-			process_right_paren(token);
+			process_right_paren();
 			break;
 		}
 	}
@@ -168,4 +167,4 @@ void ShuntingYard::create_rpn()
 vector<Token> ShuntingYard::get_rpn() const
 {
 	return rpn;
-}
+}

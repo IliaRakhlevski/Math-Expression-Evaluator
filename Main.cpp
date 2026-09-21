@@ -1,64 +1,71 @@
+/**
+ * @file Main.cpp
+ * @brief Console front end.
+ *
+ * Two modes:
+ *  - one-shot:    math_eval "2 * (3 + 4)"   prints the value, exit code 0/1;
+ *  - interactive: math_eval                 reads one expression per line
+ *                                           until an empty line, "quit" or EOF.
+ */
+#include <iomanip>
 #include <iostream>
-#include "Tokenizer.h"
-#include "ShuntingYard.h"
-#include "Evaluator.h"
+#include <string>
 
+#include "Calculator.h"
 
-
-int main()
+namespace
 {
-	std::string exp = "-(-3.4 * (-2.3+4.85) + (-1.23)) / .89";
-
-	std::cout << "Expression: " << exp << std::endl;
-
-	Tokenizer tokenizer;
-
-	TokenRetValue ret = tokenizer.tokenize(exp);
-	if (ret == TokenRetValue::INVALID_CHAR)
+	/**
+	 * @brief Print "= value" or "Error: reason".
+	 * @return true on success.
+	 */
+	bool print_result(const std::string& expression)
 	{
-		std::cout << "Invalid character" << std::endl;
-		return 0;
+		const CalcResult result = calculate(expression);
+
+		if (result.ok())
+			std::cout << "= " << result.value << '\n';
+		else
+			std::cout << "Error: " << to_message(result.error) << '\n';
+
+		return result.ok();
 	}
-	else if (ret == TokenRetValue::INVALID_NUMBER)
+}
+
+
+int main(int argc, char* argv[])
+{
+	// 12 significant digits: enough to be useful, short enough to hide
+	// binary noise such as 0.1 + 0.2 = 0.30000000000000004.
+	std::cout << std::setprecision(12);
+
+	if (argc > 1)
 	{
-		std::cout << "Invalid number" << std::endl;
-		return 0;
+		// The shell may split an unquoted expression; glue the parts back.
+		std::string expression;
+		for (int i = 1; i < argc; ++i)
+		{
+			if (i > 1)
+				expression += ' ';
+			expression += argv[i];
+		}
+		return print_result(expression) ? 0 : 1;
 	}
-	else if (ret == TokenRetValue::UNBALANCED_PARENTHESIS)
+
+	std::cout << "Enter an expression (empty line or \"quit\" to exit).\n";
+
+	std::string line;
+	while (std::cout << "> " && std::getline(std::cin, line))
 	{
-		std::cout << "Unbalanced parenthesis" << std::endl;
-		return 0;
+		// Input piped from a Windows file may keep its '\r'.
+		if (!line.empty() && line.back() == '\r')
+			line.pop_back();
+
+		if (line.empty() || line == "quit" || line == "exit")
+			break;
+
+		print_result(line);
 	}
-
-	ret = tokenizer.validate();
-	if (ret == TokenRetValue::MATH_EXP_NOT_TOKENIZED)
-	{
-		std::cout << "Math expression is not tokenized" << std::endl;
-		return 0;
-	}
-	else if (ret == TokenRetValue::INVALID_MATH_EXP)
-	{
-		std::cout << "Invalid expression" << std::endl;
-		return 0;
-	}
-	else
-		std::cout << "Correct math expression" << std::endl;
-
-	tokenizer.update_unary_minus();
-
-	ShuntingYard shunting_yard(tokenizer);
-	shunting_yard.create_rpn();
-
-
-	std::vector<Token> rpn = shunting_yard.get_rpn();
-
-	bool is_error;
-	double val = evaluate_rpn(rpn, is_error);
-
-	if (!is_error)
-		std::cout << "Evaluation result: " << val << std::endl;
-	else
-		std::cout << "Evaluation error!" << std::endl;
 
 	return 0;
 }

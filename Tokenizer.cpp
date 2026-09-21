@@ -162,7 +162,7 @@ bool Tokenizer::check_precedence(TokenType a, TokenType b)
 	auto it_a = tokens_preced_rules.find(a);
 	if (it_a == tokens_preced_rules.end()) 
 		return false;
-	vector<TokenType> vec = it_a->second;
+	const vector<TokenType>& vec = it_a->second;
 
 	auto it_b = find(vec.begin(), vec.end(), b);
 	if (it_b != vec.end())
@@ -224,4 +224,4 @@ void Tokenizer::update_unary_minus()
 std::vector<Token> Tokenizer::get_tokens() const
 {
 	return tokens;
-}
+}

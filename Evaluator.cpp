@@ -1,14 +1,7 @@
 #include <stack>
-#include <limits>
-#include <cmath>
 #include "Evaluator.h"
 using namespace std;
 
-
-
-bool isAlmostZero(double value, double epsilon = numeric_limits<double>::epsilon()) {
-	return fabs(value) < epsilon;
-}
 
 
 double perform_binary_operation(double left_val, double right_val, TokenType token_type, bool &is_error)
@@ -27,7 +20,9 @@ double perform_binary_operation(double left_val, double right_val, TokenType tok
 		val = left_val * right_val;
 		break;
 	case TokenType::DIV:
-		if (!isAlmostZero(right_val))
+		// Exact comparison on purpose: only a true zero is undefined.
+		// 1 / 1e-20 is a valid (large) result, not a division by zero.
+		if (right_val != 0.0)
 			val = left_val / right_val;
 		else
 			is_error = true;
@@ -46,7 +41,7 @@ double evaluate_rpn(const vector<Token> &rpn, bool &error)
 	double res = 0.0;
 	error = false;
 
-	for (const Token token : rpn)
+	for (const Token& token : rpn)
 	{
 		TokenType token_type = Tokenizer::get_token_type(token);
 
@@ -98,6 +93,13 @@ double evaluate_rpn(const vector<Token> &rpn, bool &error)
 				}
 				break;
 			}
+			case TokenType::LPAREN:
+			case TokenType::RPAREN:
+			{
+				// Parentheses never reach RPN; seeing one means a malformed input.
+				error = true;
+				return res;
+			}
 
 		} // end switch
 	}
@@ -110,4 +112,4 @@ double evaluate_rpn(const vector<Token> &rpn, bool &error)
 		error = true;
 
 	return res;
-}
+}

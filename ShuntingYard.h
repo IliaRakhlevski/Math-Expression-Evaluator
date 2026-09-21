@@ -25,7 +25,7 @@ class ShuntingYard
 	Associative get_associative(const Token& token);
 	ComparePrecedenceRes compare_precedences(const Token& token_a, const Token& token_b);
 	void process_operator(Token& token);
-	void process_right_paren(Token& token);
+	void process_right_paren();
 
 public:
 	ShuntingYard() = delete;
@@ -34,4 +34,4 @@ public:
 	void create_rpn();
 
 	std::vector<Token> get_rpn() const;
-};
+};

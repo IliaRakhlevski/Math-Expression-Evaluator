@@ -1,0 +1,15 @@
+# CMake build trees
+build/
+out/
+
+# Visual Studio
+.vs/
+x64/
+Debug/
+Release/
+*.user
+*.suo
+*.vcxproj
+*.vcxproj.filters
+*.sln
+CMakeSettings.json
