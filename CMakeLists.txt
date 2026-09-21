@@ -16,7 +16,10 @@ add_library(mee_core STATIC
 target_include_directories(mee_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(MSVC)
-    target_compile_options(mee_core PUBLIC /W4 /permissive-)
+    # /EHsc is normally in CMake's default flags, but CI passes its own
+    # CMAKE_CXX_FLAGS (for sanitizers), which replaces the defaults.
+    # Without /EHsc, try/catch triggers warning C4530, an error under /WX.
+    target_compile_options(mee_core PUBLIC /W4 /permissive- /EHsc)
     if(MEE_WERROR)
         target_compile_options(mee_core PUBLIC /WX)
     endif()
