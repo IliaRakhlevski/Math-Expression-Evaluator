@@ -67,7 +67,7 @@ else
 
 ## Limitations
 
-These are deliberate scope decisions, each covered by a test:
+These are deliberate scope decisions:
 
 - Unary minus is accepted only at the start of the expression or right after
   `(`. `2 * -3` is rejected; write `2 * (-3)`.
@@ -99,7 +99,7 @@ These are deliberate scope decisions, each covered by a test:
    what makes `2-3-4` equal `(2-3)-4` and `1+2*3` equal `1+(2*3)`.
 5. **Evaluate RPN** (`evaluate_rpn`). Numbers are pushed; each operator pops its
    operands and pushes the result. A zero divisor is detected with an exact
-   comparison: only a true zero is undefined, and `1 / 1e-20` is a valid result.
+   comparison: only a true zero is undefined, and `1 / 0.0000000000000001` is a valid result.
 
 `calculate()` (`Calculator.h`) runs the five steps in the required order and
 maps their status codes to one public `CalcError`. Callers never need to know
