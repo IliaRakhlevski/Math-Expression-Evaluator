@@ -23,7 +23,8 @@ jobs:
           - name: Linux GCC + sanitizers
             os: ubuntu-latest
             cxx: g++
-            flags: "-fsanitize=address,undefined -fno-omit-frame-pointer"
+            # -fno-sanitize-recover=all: a UBSan error stops the test (otherwise it only prints)
+            flags: "-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
           - name: Windows MSVC
             os: windows-latest
             cxx: ""
